@@ -1,0 +1,40 @@
+#!/bin/bash
+
+changeToLaptop="xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal --output DP-2 --off --output DP-1 --off --output HDMI-1 --off --output DP-1-2 --off --output DP-1-1 --off"
+changeToMonitors="xrandr --output eDP-1 --off --output DP-2 --mode 1920x1080 --pos 0x0 --rotate left --output DP-1 --off --output HDMI-1 --off --output DP-1-2 --primary --mode 2560x1440 --pos 1080x224 --rotate normal --output DP-1-1 --off"
+
+if [[ "$*" == *monitors* ]]; then
+    eval $changeToMonitors
+
+elif [[ "$*" == *laptop* ]]; then
+    eval $changeToLaptop
+
+elif [[ "$*" == *toggle* ]]; then
+    array=()
+    for output in $(xrandr --listmonitors | grep '+' | awk {'print $4'}); do
+        array+=($output)
+    done
+    if [[ "${array[0]}" == "eDP-1" ]]; then
+        eval $changeToMonitors
+    else
+        eval $changeToLaptop
+    fi
+
+elif [[ "$*" == *auto* ]]; then
+    for output in $(xrandr | grep '\Wconnected' | awk '{ print $1 }'); do
+        [[ $output =~ ^DP- ]] && array+=($output)
+    done
+
+    if [ "${#array[@]}" -eq 0 ]; then
+        eval $changeToLaptop
+    else
+        eval $changeToMonitors
+    fi
+else
+    echo "useage: autoxrandr [option]
+  where options are:
+  -monitors
+  -laptop
+  -toggle
+  -auto"
+fi
