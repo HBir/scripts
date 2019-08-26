@@ -31,7 +31,7 @@ elif [[ "$*" == *auto* ]]; then
         eval $changeToMonitors
     fi
 else
-    echo "useage: autoxrandr [option]
+    echo "usage: autoxrandr [option]
   where options are:
   -monitors
   -laptop
